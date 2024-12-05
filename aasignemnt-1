@@ -1,0 +1,209 @@
+1.
+a)
+CREATE TABLE Books(
+BookID INT PRIMARY KEY,
+Title VARCHAR(100),
+Author VARCHAR(50),
+PublishedYear INT);
+
+b)
+ALTER TABLE Books ADD COLUMN ISBN VARCHAR(13)
+
+c)
+ALTER TABLE Books Drop COLUMN PublishedYear
+
+2.
+a)
+CREATE TABLE Students(
+StudentID INT PRIMARY KEY,
+Name VARCHAR(100),
+Age INT,
+Grade VARCHAR(5))
+
+b)
+INSERT INTO Students(StudentID, Name, Age, Grade)
+VALUES
+    (101, 'John Smith', 15, 'A'),
+    (102, 'Jane Doe', 16, 'B'),
+    (103, 'Alice Lee', 14, 'A');
+
+c)
+UPDATE Students
+SET Grade = 'A+'
+WHERE Name = 'Jane Doe';
+
+d)
+DELETE FROM Students
+WHERE Grade = 'C';
+
+3.
+a)
+GRANT SELECT, INSERT ON Books TO User2;
+
+b)
+REVOKE INSERT ON Books FROM User2;
+
+4.
+a)
+BEGIN TRANSACTION;
+
+b)
+INSERT INTO Orders (order_id, customer_id, amount)
+VALUES (6, 4, 400);
+
+c)
+UPDATE Inventory
+SET Quantity = Quantity - 2
+WHERE ProductID = 105 AND Quantity >= 2;
+
+d)
+IF @@ERROR != 0
+    	ROLLBACK;
+ELSE
+    	COMMIT;
+END
+
+5.
+a)
+CREATE TABLE Customers (
+    CustomerID INT PRIMARY KEY,  
+    Name VARCHAR(50),           
+    Email VARCHAR(50),           
+    Phone VARCHAR(15)            
+);
+
+b)
+INSERT INTO Customers (CustomerID, Name, Email, Phone)
+VALUES (201, 'Emily Clark', 'emily@example.com', '1234567890');
+
+c)
+GRANT SELECT ON Customers TO 'AdminUser';
+
+d)
+BEGIN TRANSACTION;
+	INSERT INTO Customers (CustomerID, Name, Email, Phone)
+	VALUES (202, 'John', 'john@example.com', '1234123456');
+	ROLLBACK;
+
+
+6.
+a)
+CREATE TABLE Employees (
+    EmployeeID INT PRIMARY KEY,          
+    Name VARCHAR(50),                    
+    Department VARCHAR(30),              
+    Salary INT                           
+);
+
+b)
+ALTER TABLE Employees
+RENAME COLUMN Department TO Dept;
+
+c)
+ALTER TABLE Employees
+ADD COLUMN JoiningDate DATE DEFAULT '2024-01-01';
+
+d)
+ALTER TABLE Employees
+DROP COLUMN Salary;
+
+e)
+CREATE TABLE Departments (
+    DeptID INT PRIMARY KEY,             
+    DeptName VARCHAR(30) UNIQUE          
+);
+ALTER TABLE Employees
+ADD COLUMN DeptID INT,
+ADD CONSTRAINT fk_DeptID FOREIGN KEY (DeptID) REFERENCES Departments(DeptID);
+
+7.
+a)
+INSERT INTO Employees (EmployeeID, Name, Department, Salary)
+VALUES (1, 'Alice', 'HR', 50000);
+
+b)
+SELECT * 
+FROM Employees
+WHERE Department = 'HR';
+
+c)
+UPDATE Employees
+SET Salary = Salary * 1.1
+WHERE Department = 'IT';
+
+d)
+DELETE FROM Employees
+WHERE Salary < 40000;
+
+e)
+MERGE INTO Employees AS Target
+USING (VALUES(1,'Alice','HR',55000)) AS Source (EmployeeID,Name,Department,Salary)
+ON Target.EmployeeID = Source.EmployeeID
+WHEN MATCHED THEN
+UPDATE SET Salary = Source.Salary
+WHEN NOT MATCHED THEN
+INSERT (EmployeeID, Name, Department, Salary)
+VALUES (Source.EmployeeID, Source.Name, Source.Department, Source.Salary);
+
+8.
+a)
+GRANT SELECT, UPDATE ON Employees TO HRManager;
+
+b)
+REVOKE UPDATE ON Employees FROM HRManager;
+
+c)
+CREATE ROLE DataViewer;
+GRANT SELECT ON ALL TABLES TO DataViewer;
+
+d)
+GRANT DataViewer TO Viewer1;
+
+e)
+REVOKE ALL PRIVILEGES ON ALL TABLES FROM InternUser;
+
+9.
+a)	BEGIN TRANSACTION;
+	INSERT INTO Departments (DeptID, DeptName)
+	VALUES (1, 'Finance');
+
+b)	COMMIT;
+
+c)
+BEGIN TRANSACTION;
+INSERT INTO Departments (DeptID, DeptName)
+VALUES (2, 'IT');
+IF @@ERROR != 0
+    	ROLLBACK;
+ELSE
+    	COMMIT;
+
+d)
+BEGIN TRANSACTION;
+SAVEPOINT BeforeInsert;
+INSERT INTO Employees (EmployeeID, Name, Department, Salary)
+VALUES (2, 'Bob', 'Finance', 45000);
+	IF @@ERROR != 0
+    		ROLLBACK TO BeforeInsert;
+	COMMIT;
+
+10.
+a)
+CREATE TABLE Projects (
+ProjectID INT PRIMARY KEY,
+ProjectName VARCHAR(50),
+EmployeeID INT,
+FOREIGN KEY (EmployeeID) REFERENCES Employees(EmployeeID));
+
+b)
+INSERT INTO Projects (ProjectID, ProjectName, EmployeeID)
+VALUES (101, 'Website Upgrade', 1);
+
+c)
+BEGIN TRANSACTION;
+INSERT INTO Projects (ProjectID, ProjectName, EmployeeID)
+VALUES (102, 'Mobile App Development', 2);
+IF @@ERROR != 0
+    	ROLLBACK;
+ELSE
+   	COMMIT;
